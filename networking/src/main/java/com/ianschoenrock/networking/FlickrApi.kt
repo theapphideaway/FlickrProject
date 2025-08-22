@@ -5,7 +5,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface FlickrApi {
-    @GET("rest/")
+    @GET(".")
     suspend fun searchPhotos(
         @Query("method") method: String = "flickr.photos.search",
         @Query("api_key") apiKey: String = BuildConfig.FLICKR_API_KEY,

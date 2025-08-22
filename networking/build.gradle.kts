@@ -22,9 +22,9 @@ android {
     }
 
     buildTypes {
-        debug{
-            buildConfigField("String", "FLICKR_BASE_URL", "\"${project.findProperty("flickr.base.url")}\"")
-            buildConfigField("String", "FLICKR_API_KEY", "\"${project.findProperty("flickr.api.key")}\"")
+        debug {
+            buildConfigField("String", "FLICKR_BASE_URL", "\"${findProperty("flickr.base.url") }\"")
+            buildConfigField("String", "FLICKR_API_KEY", "\"${findProperty("flickr.api.key") }\"")
         }
         release {
             isMinifyEnabled = false
@@ -32,8 +32,8 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "FLICKR_BASE_URL", "\"${project.findProperty("flickr.base.url")}\"")
-            buildConfigField("String", "FLICKR_API_KEY", "\"${project.findProperty("flickr.api.key")}\"")
+            buildConfigField("String", "FLICKR_BASE_URL", "\"${findProperty("flickr.base.url")}\"")
+            buildConfigField("String", "FLICKR_API_KEY", "\"${findProperty("flickr.api.key") }\"")
         }
     }
     compileOptions {
@@ -55,6 +55,8 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.moshi)
     implementation(libs.moshi.converter)
+    implementation(libs.moshi.kotlin)
+    implementation(libs.okhttp.interceptor)
 
     // Dependency Injection
     implementation(libs.hilt)
