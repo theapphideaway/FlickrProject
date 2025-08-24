@@ -18,6 +18,10 @@ moshi-converter = "3.0.0"
 hilt = "2.57.1"
 hilt-compiler = "2.57.1"
 hilt-navigation-compose = "1.2.0"
+mockito-kotlin = "6.0.0"
+mockito-core = "5.19.0"
+coroutines-test = "1.10.2"
+mockwebserver = "5.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +41,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit"}
 okhttp-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp-interceptor"}
 moshi = {group = "com.squareup.moshi", name = "moshi", version.ref = "moshi"}
@@ -46,6 +51,11 @@ moshi-converter = { group = "com.squareup.retrofit2", name = "converter-moshi", 
 hilt = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt"}
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt-compiler"}
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose"}
+
+mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mockito-core"}
+mockito-kotlin = { group = "org.mockito.kotlin", name = "mockito-kotlin", version.ref = "mockito-kotlin"}
+coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines-test" }
+mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

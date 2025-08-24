@@ -19,6 +19,9 @@ class PhotosViewModel @Inject constructor(
     private val _photos = MutableStateFlow<List<Photo>>(emptyList())
     val photos: StateFlow<List<Photo>> = _photos
 
+    private val _selectedPhoto = MutableStateFlow<Photo?>(null)
+    val selectedPhoto: StateFlow<Photo?> = _selectedPhoto
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
@@ -49,6 +52,18 @@ class PhotosViewModel @Inject constructor(
                 _isLoading.value = false
             }
         }
+    }
+
+    fun selectPhoto(photo: Photo) {
+        _selectedPhoto.value = photo
+    }
+
+    fun clearSelection() {
+        _selectedPhoto.value = null
+    }
+
+    fun clearError() {
+        _errorMessage.value = null
     }
 
     fun getPhotoUrl(photo: Photo, size: String = "m"): String {
