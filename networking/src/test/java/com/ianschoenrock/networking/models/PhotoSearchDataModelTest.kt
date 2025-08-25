@@ -1,4 +1,4 @@
-package com.ianschoenrock.networking
+package com.ianschoenrock.networking.models
 
 import com.ianschoenrock.networking.models.search.Photo
 import com.ianschoenrock.networking.models.search.PhotoSearchResponse

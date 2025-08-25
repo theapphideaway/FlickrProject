@@ -1,5 +1,6 @@
-package com.ianschoenrock.networking
+package com.ianschoenrock.networking.endpoints
 
+import com.ianschoenrock.networking.FlickrApi
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.runBlocking
@@ -12,7 +13,7 @@ import org.junit.Assert.*
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 
-class FlickrApiTest {
+class SearchEndpointTest {
 
     private lateinit var mockWebServer: MockWebServer
     private lateinit var flickrApi: FlickrApi
