@@ -66,9 +66,10 @@ class PhotosViewModel @Inject constructor(
 
     fun selectPhoto(photo: Photo) {
         _selectedPhoto.value = photo
+        fetchPhotoInfo(photo)
     }
 
-    fun fetchPhotoInfo(photo: Photo) {
+    private fun fetchPhotoInfo(photo: Photo) {
         viewModelScope.launch {
             _isLoadingPhotoInfo.value = true
             _photoInfoError.value = null
@@ -103,7 +104,7 @@ class PhotosViewModel @Inject constructor(
     }
 
     fun getPhotoUrl(photo: Photo, size: String = "m"): String {
-        return "https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg"
+        return "https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_${size}.jpg"
     }
 
     fun getHeroPhotoUrl(photo: Photo): String {

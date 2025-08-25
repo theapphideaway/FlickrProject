@@ -2,6 +2,11 @@ package com.ianschoenrock.flickrproject
 
 import com.ianschoenrock.flickrproject.ui.viewmodels.PhotosViewModel
 import com.ianschoenrock.networking.FlickrApi
+import com.ianschoenrock.networking.models.details.PhotoContent
+import com.ianschoenrock.networking.models.details.PhotoDates
+import com.ianschoenrock.networking.models.details.PhotoInfo
+import com.ianschoenrock.networking.models.details.PhotoInfoResponse
+import com.ianschoenrock.networking.models.details.PhotoOwner
 import com.ianschoenrock.networking.models.search.Photo
 import com.ianschoenrock.networking.models.search.PhotoSearchResponse
 import com.ianschoenrock.networking.models.search.Photos
@@ -182,6 +187,112 @@ class PhotosViewModelTest {
     }
 
     @Test
+    fun `selectPhoto triggers photo info fetch`() = runTest {
+        val photo = Photo("1", "owner", "secret", "server", 1, "title", 1, 0, 0)
+        val mockPhotoInfo = createMockPhotoInfo()
+        val mockResponse = PhotoInfoResponse(photo = mockPhotoInfo, stat = "ok")
+
+        whenever(flickrApi.getPhotoInfo(
+            method = eq("flickr.photos.getInfo"),
+            apiKey = any(),
+            photoId = eq("1"),
+            secret = eq("secret"),
+            format = eq("json"),
+            nojsoncallback = eq(1)
+        )).thenReturn(mockResponse)
+
+        viewModel.selectPhoto(photo)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        Assert.assertEquals(photo, viewModel.selectedPhoto.first())
+        Assert.assertEquals(mockPhotoInfo, viewModel.selectedPhotoInfo.first())
+        Assert.assertFalse(viewModel.isLoadingPhotoInfo.first())
+        Assert.assertNull(viewModel.photoInfoError.first())
+        verify(flickrApi).getPhotoInfo(
+            method = eq("flickr.photos.getInfo"),
+            apiKey = any(),
+            photoId = eq("1"),
+            secret = eq("secret"),
+            format = eq("json"),
+            nojsoncallback = eq(1)
+        )
+    }
+
+    @Test
+    fun `selectPhoto handles photo info fetch error`() = runTest {
+        val photo = Photo("1", "owner", "secret", "server", 1, "title", 1, 0, 0)
+
+        whenever(flickrApi.getPhotoInfo(
+            method = eq("flickr.photos.getInfo"),
+            apiKey = any(),
+            photoId = eq("1"),
+            secret = eq("secret"),
+            format = eq("json"),
+            nojsoncallback = eq(1)
+        )).thenThrow(RuntimeException("Network error"))
+
+        viewModel.selectPhoto(photo)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        Assert.assertEquals(photo, viewModel.selectedPhoto.first())
+        Assert.assertNull(viewModel.selectedPhotoInfo.first())
+        Assert.assertFalse(viewModel.isLoadingPhotoInfo.first())
+        Assert.assertEquals("Network Error: Network error", viewModel.photoInfoError.first())
+    }
+
+    @Test
+    fun `selectPhoto handles API failure response for photo info`() = runTest {
+        val photo = Photo("1", "owner", "secret", "server", 1, "title", 1, 0, 0)
+        val mockResponse = PhotoInfoResponse(
+            photo = createMockPhotoInfo(), // This won't be used since stat is fail
+            stat = "fail"
+        )
+
+        whenever(flickrApi.getPhotoInfo(
+            method = eq("flickr.photos.getInfo"),
+            apiKey = any(),
+            photoId = eq("1"),
+            secret = eq("secret"),
+            format = eq("json"),
+            nojsoncallback = eq(1)
+        )).thenReturn(mockResponse)
+
+        viewModel.selectPhoto(photo)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        Assert.assertEquals(photo, viewModel.selectedPhoto.first())
+        Assert.assertNull(viewModel.selectedPhotoInfo.first())
+        Assert.assertFalse(viewModel.isLoadingPhotoInfo.first())
+        Assert.assertEquals("Failed to load photo details", viewModel.photoInfoError.first())
+    }
+
+    @Test
+    fun `photo info loading completes correctly`() = runTest {
+        val photo = Photo("1", "owner", "secret", "server", 1, "title", 1, 0, 0)
+        val mockPhotoInfo = createMockPhotoInfo()
+        val mockResponse = PhotoInfoResponse(photo = mockPhotoInfo, stat = "ok")
+
+        whenever(flickrApi.getPhotoInfo(
+            method = eq("flickr.photos.getInfo"),
+            apiKey = any(),
+            photoId = eq("1"),
+            secret = eq("secret"),
+            format = eq("json"),
+            nojsoncallback = eq(1)
+        )).thenReturn(mockResponse)
+
+        Assert.assertFalse(viewModel.isLoadingPhotoInfo.first())
+
+        viewModel.selectPhoto(photo)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        Assert.assertFalse(viewModel.isLoadingPhotoInfo.first())
+        Assert.assertEquals(mockPhotoInfo, viewModel.selectedPhotoInfo.first())
+        Assert.assertNull(viewModel.photoInfoError.first())
+    }
+
+
+    @Test
     fun `clearSelection resets selectedPhoto state`() = runTest {
         val photo = Photo("1", "owner", "secret", "server", 1, "title", 1, 0, 0)
         viewModel.selectPhoto(photo)
@@ -220,5 +331,41 @@ class PhotosViewModelTest {
 
         Assert.assertEquals("https://live.staticflickr.com/456/123_abc123_m.jpg", url)
         Assert.assertEquals("https://live.staticflickr.com/456/123_abc123_z.jpg", customSizeUrl)
+    }
+
+    @Test
+    fun `getHeroPhotoUrl returns correct URL format`() {
+        val photo = Photo("123", "owner", "abc123", "456", 7, "title", 1, 0, 0)
+
+        val heroUrl = viewModel.getHeroPhotoUrl(photo)
+
+        Assert.assertEquals("https://live.staticflickr.com/456/123_abc123_b.jpg", heroUrl)
+    }
+
+    private fun createMockPhotoInfo(): PhotoInfo {
+        return PhotoInfo(
+            id = "1",
+            secret = "secret",
+            server = "server",
+            farm = 1,
+            dateUploaded = "1634567890",
+            isFavorite = 0,
+            license = "0",
+            safetyLevel = "0",
+            rotation = 0,
+            title = PhotoContent("Test Photo Title"),
+            description = PhotoContent("This is a test photo description"),
+            dates = PhotoDates(
+                posted = "1634567890",
+                taken = "2021-10-18 14:30:45",
+                takenGranularity = "0"
+            ),
+            owner = PhotoOwner(
+                nsId = "12345@N00",
+                username = "testuser",
+                realName = "Test User",
+                location = "Test Location"
+            )
+        )
     }
 }

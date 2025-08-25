@@ -43,10 +43,6 @@ fun PhotoDetailScreen(
     val isLoadingPhotoInfo by viewModel.isLoadingPhotoInfo.collectAsStateWithLifecycle()
     val photoInfoError by viewModel.photoInfoError.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.fetchPhotoInfo(photo)
-    }
-
     Column(
         modifier = modifier
             .fillMaxSize()
