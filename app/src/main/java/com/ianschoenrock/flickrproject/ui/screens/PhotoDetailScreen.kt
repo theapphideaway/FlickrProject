@@ -23,6 +23,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import com.ianschoenrock.flickrproject.ui.components.ZoomableAsyncImage
 import com.ianschoenrock.flickrproject.ui.viewmodels.PhotosViewModel
 import com.ianschoenrock.networking.models.details.getFormattedDatePosted
 import com.ianschoenrock.networking.models.details.getFormattedDateTaken
@@ -80,8 +81,8 @@ fun PhotoDetailScreen(
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(context)
+                ZoomableAsyncImage(
+                    imageRequest = ImageRequest.Builder(LocalContext.current)
                         .data(viewModel.getHeroPhotoUrl(photo))
                         .setHeader("Referer", "https://www.flickr.com/")
                         .setHeader("User-Agent", "Mozilla/5.0 (Android) Coil")
@@ -89,11 +90,7 @@ fun PhotoDetailScreen(
                         .diskCachePolicy(CachePolicy.ENABLED)
                         .build(),
                     contentDescription = photoInfo?.title?._content ?: photo.title.ifEmpty { "Photo" },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 250.dp, max = 500.dp)
-                        .clip(RoundedCornerShape(16.dp)),
-                    contentScale = ContentScale.Fit
+                    shape = RoundedCornerShape(16.dp)
                 )
             }
 
