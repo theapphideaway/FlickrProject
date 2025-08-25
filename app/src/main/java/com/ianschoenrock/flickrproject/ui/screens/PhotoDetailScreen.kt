@@ -77,7 +77,8 @@ fun PhotoDetailScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .widthIn(max = 500.dp),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
                 shape = RoundedCornerShape(16.dp)
             ) {

@@ -55,8 +55,10 @@ fun MainPhotoScreen(
     val focusManager = LocalFocusManager.current
 
     LaunchedEffect(Unit) {
-        viewModel.searchPhotos("cats")
-        searchQuery = "cats"
+        if(photos.isEmpty()) {
+            viewModel.searchPhotos("cats")
+            searchQuery = "cats"
+        }
     }
 
     val gridState = rememberLazyGridState()
