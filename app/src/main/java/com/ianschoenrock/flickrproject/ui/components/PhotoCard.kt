@@ -39,7 +39,6 @@ fun PhotoCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column {
             AsyncImage(
                 model = ImageRequest.Builder(ctx)
                     .data(imageUrl)
@@ -56,18 +55,5 @@ fun PhotoCard(
                 contentScale = ContentScale.Crop
             )
 
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Text(
-                    text = photo.title.ifEmpty { "Untitled" },
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-        }
     }
 }
