@@ -40,6 +40,7 @@ fun MainPhotoScreen(
     viewModel: PhotosViewModel = hiltViewModel()
 ) {
     val photos by viewModel.photos.collectAsStateWithLifecycle()
+    val selectedPhoto by viewModel.selectedPhoto.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
 
@@ -50,6 +51,15 @@ fun MainPhotoScreen(
     LaunchedEffect(Unit) {
         viewModel.searchPhotos("cats")
         searchQuery = "cats"
+    }
+
+    selectedPhoto?.let { photo ->
+        PhotoDetailScreen(
+            photo = photo,
+            onBackClick = { viewModel.clearSelection() },
+            viewModel = viewModel
+        )
+        return
     }
 
     Column(

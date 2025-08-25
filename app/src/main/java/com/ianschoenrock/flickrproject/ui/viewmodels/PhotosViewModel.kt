@@ -4,7 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ianschoenrock.networking.FlickrApi
-import com.ianschoenrock.networking.models.Photo
+import com.ianschoenrock.networking.models.details.PhotoInfo
+import com.ianschoenrock.networking.models.search.Photo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,11 +23,20 @@ class PhotosViewModel @Inject constructor(
     private val _selectedPhoto = MutableStateFlow<Photo?>(null)
     val selectedPhoto: StateFlow<Photo?> = _selectedPhoto
 
+    private val _selectedPhotoInfo = MutableStateFlow<PhotoInfo?>(null)
+    val selectedPhotoInfo: StateFlow<PhotoInfo?> = _selectedPhotoInfo
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _isLoadingPhotoInfo = MutableStateFlow(false)
+    val isLoadingPhotoInfo: StateFlow<Boolean> = _isLoadingPhotoInfo
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
+
+    private val _photoInfoError = MutableStateFlow<String?>(null)
+    val photoInfoError: StateFlow<String?> = _photoInfoError
 
     fun searchPhotos(query: String) {
         if(query.isBlank()) return
@@ -58,6 +68,32 @@ class PhotosViewModel @Inject constructor(
         _selectedPhoto.value = photo
     }
 
+    fun fetchPhotoInfo(photo: Photo) {
+        viewModelScope.launch {
+            _isLoadingPhotoInfo.value = true
+            _photoInfoError.value = null
+            _selectedPhotoInfo.value = null
+
+            try {
+                val response = flickrApi.getPhotoInfo(
+                    photoId = photo.id,
+                    secret = photo.secret
+                )
+
+                if (response.stat == "ok") {
+                    _selectedPhotoInfo.value = response.photo
+                } else {
+                    _photoInfoError.value = "Failed to load photo details"
+                }
+            } catch (e: Exception) {
+                _photoInfoError.value = "Network Error: ${e.message}"
+                Log.println(Log.ERROR, "PHOTO_INFO_FAILURE", "Error: ${e.message}")
+            } finally {
+                _isLoadingPhotoInfo.value = false
+            }
+        }
+    }
+
     fun clearSelection() {
         _selectedPhoto.value = null
     }
@@ -68,5 +104,9 @@ class PhotosViewModel @Inject constructor(
 
     fun getPhotoUrl(photo: Photo, size: String = "m"): String {
         return "https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg"
+    }
+
+    fun getHeroPhotoUrl(photo: Photo): String {
+        return "https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_b.jpg"
     }
 }
