@@ -1,4 +1,4 @@
-package com.ianschoenrock.networking.models
+package com.ianschoenrock.networking.models.search
 
 import com.squareup.moshi.Json
 

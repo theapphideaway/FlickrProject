@@ -1,11 +1,10 @@
 package com.ianschoenrock.flickrproject
 
 import com.ianschoenrock.flickrproject.ui.viewmodels.PhotosViewModel
-import com.ianschoenrock.networking.BuildConfig
 import com.ianschoenrock.networking.FlickrApi
-import com.ianschoenrock.networking.models.Photo
-import com.ianschoenrock.networking.models.PhotoSearchResponse
-import com.ianschoenrock.networking.models.Photos
+import com.ianschoenrock.networking.models.search.Photo
+import com.ianschoenrock.networking.models.search.PhotoSearchResponse
+import com.ianschoenrock.networking.models.search.Photos
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,7 +24,6 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
-import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PhotosViewModelTest {

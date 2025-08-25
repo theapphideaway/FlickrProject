@@ -1,4 +1,4 @@
-package com.ianschoenrock.networking.models
+package com.ianschoenrock.networking.models.search
 
 data class Photos(
     val page: Int,

@@ -1,8 +1,8 @@
 package com.ianschoenrock.networking
 
-import com.ianschoenrock.networking.models.Photo
-import com.ianschoenrock.networking.models.PhotoSearchResponse
-import com.ianschoenrock.networking.models.Photos
+import com.ianschoenrock.networking.models.search.Photo
+import com.ianschoenrock.networking.models.search.PhotoSearchResponse
+import com.ianschoenrock.networking.models.search.Photos
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.junit.Before
