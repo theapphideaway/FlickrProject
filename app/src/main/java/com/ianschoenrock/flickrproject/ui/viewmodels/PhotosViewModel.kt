@@ -17,6 +17,8 @@ class PhotosViewModel @Inject constructor(
     private val flickrApi: FlickrApi
 ) : ViewModel() {
 
+    companion object { private const val PER_PAGE = 20 }
+
     private val _photos = MutableStateFlow<List<Photo>>(emptyList())
     val photos: StateFlow<List<Photo>> = _photos
 
@@ -29,6 +31,13 @@ class PhotosViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading
 
+    private val _isLoadingMore = MutableStateFlow(false)
+    val isLoadingMore: StateFlow<Boolean> = _isLoadingMore
+
+
+    private val _endReached = MutableStateFlow(false)
+    val endReached: StateFlow<Boolean> = _endReached
+
     private val _isLoadingPhotoInfo = MutableStateFlow(false)
     val isLoadingPhotoInfo: StateFlow<Boolean> = _isLoadingPhotoInfo
 
@@ -38,9 +47,18 @@ class PhotosViewModel @Inject constructor(
     private val _photoInfoError = MutableStateFlow<String?>(null)
     val photoInfoError: StateFlow<String?> = _photoInfoError
 
+
+    private var currentQuery: String = ""
+    private var currentPage: Int = 0
+    private var totalPages: Int = Int.MAX_VALUE
+
     fun searchPhotos(query: String) {
         if(query.isBlank()) return
-
+        currentQuery = query
+        currentPage = 0
+        totalPages = Int.MAX_VALUE
+        _endReached.value = false
+        _photos.value = emptyList()
         viewModelScope.launch{
             _isLoading.value = true
             _errorMessage.value = null
@@ -61,6 +79,49 @@ class PhotosViewModel @Inject constructor(
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    fun loadNextPage() {
+        if (currentQuery.isBlank() || _isLoading.value || _isLoadingMore.value || _endReached.value) return
+        val next = if (currentPage == 0) 1 else currentPage + 1
+        if (next > totalPages) { _endReached.value = true; return }
+
+        viewModelScope.launch {
+            _isLoadingMore.value = true
+            try {
+                loadPage(page = next, firstPage = false)
+            } catch (e: Exception) {
+                _errorMessage.value = "Network Error: ${e.message}"
+            } finally {
+                _isLoadingMore.value = false
+            }
+        }
+    }
+
+    private suspend fun loadPage(page: Int, firstPage: Boolean) {
+        val response = flickrApi.searchPhotos(
+            searchText = currentQuery,
+            page = page,
+            perPage = PER_PAGE
+        )
+
+        if (response.stat != "ok") {
+            if (firstPage) _photos.value = emptyList()
+            _endReached.value = true
+            _errorMessage.value = response.stat
+            return
+        }
+
+        val p = response.photos
+        currentPage = p.page
+        totalPages = p.pages
+
+        val newItems = p.photo
+        _photos.value = if (firstPage) newItems else _photos.value + newItems
+
+        if (currentPage >= totalPages || newItems.isEmpty()) {
+            _endReached.value = true
         }
     }
 

@@ -11,6 +11,8 @@ interface FlickrApi {
         @Query("method") method: String = "flickr.photos.search",
         @Query("api_key") apiKey: String = BuildConfig.FLICKR_API_KEY,
         @Query("text") searchText: String,
+        @Query("page") page: Int? = null,
+        @Query("per_page") perPage: Int = 20,
         @Query("format") format: String = "json",
         @Query("nojsoncallback") noCallback: Int = 1
     ): PhotoSearchResponse

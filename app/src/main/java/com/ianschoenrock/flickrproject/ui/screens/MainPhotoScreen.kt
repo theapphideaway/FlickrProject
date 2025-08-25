@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,6 +34,8 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.ianschoenrock.flickrproject.ui.components.PhotoCard
 import com.ianschoenrock.flickrproject.ui.viewmodels.PhotosViewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +46,9 @@ fun MainPhotoScreen(
     val photos by viewModel.photos.collectAsStateWithLifecycle()
     val selectedPhoto by viewModel.selectedPhoto.collectAsStateWithLifecycle()
     val isLoading by viewModel.isLoading.collectAsStateWithLifecycle()
+    val isLoadingMore by viewModel.isLoadingMore.collectAsStateWithLifecycle()
     val errorMessage by viewModel.errorMessage.collectAsStateWithLifecycle()
+    val endReached by viewModel.endReached.collectAsStateWithLifecycle()
 
     var searchQuery by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -51,6 +57,18 @@ fun MainPhotoScreen(
     LaunchedEffect(Unit) {
         viewModel.searchPhotos("cats")
         searchQuery = "cats"
+    }
+
+    val gridState = rememberLazyGridState()
+    LaunchedEffect(gridState, photos, endReached) {
+        snapshotFlow {
+            val lastVisible = gridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val total = gridState.layoutInfo.totalItemsCount
+            lastVisible >= total - 6 && total > 0
+        }
+            .distinctUntilChanged()
+            .filter { it && !endReached }
+            .collect { viewModel.loadNextPage() }
     }
 
     selectedPhoto?.let { photo ->
@@ -192,7 +210,8 @@ fun MainPhotoScreen(
                 )
 
                 LazyVerticalGrid(
-                    columns = GridCells.Fixed(2), // 2 columns for gallery view
+                    state = gridState,
+                    columns = GridCells.Fixed(2),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     contentPadding = PaddingValues(bottom = 16.dp)
@@ -206,7 +225,39 @@ fun MainPhotoScreen(
                             }
                         )
                     }
+                    item(span = { GridItemSpan(2) }) {
+                        when {
+                            isLoadingMore -> {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 12.dp),
+                                    horizontalArrangement = Arrangement.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                    Spacer(Modifier.width(12.dp))
+                                    Text("Loading more…")
+                                }
+                            }
+
+                            endReached && photos.isNotEmpty() -> {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 12.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = "— End of results —",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
+
             }
 
             else -> {
