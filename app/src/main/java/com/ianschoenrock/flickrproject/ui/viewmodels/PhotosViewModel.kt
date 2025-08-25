@@ -67,6 +67,6 @@ class PhotosViewModel @Inject constructor(
     }
 
     fun getPhotoUrl(photo: Photo, size: String = "m"): String {
-        return "https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_${size}.jpg"
+        return "https://live.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}.jpg"
     }
 }
