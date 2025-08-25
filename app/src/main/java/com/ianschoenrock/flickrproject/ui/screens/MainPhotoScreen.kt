@@ -23,6 +23,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -97,7 +98,8 @@ fun MainPhotoScreen(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .testTag("SearchField"),
                 placeholder = { Text("Search for photos...") },
                 leadingIcon = {
                     Icon(
@@ -216,12 +218,14 @@ fun MainPhotoScreen(
                     columns = GridCells.Fixed(2),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    contentPadding = PaddingValues(bottom = 16.dp)
+                    contentPadding = PaddingValues(bottom = 16.dp),
+                    modifier = Modifier.testTag("PhotoGrid")
                 ) {
                     items(photos) { photo ->
                         PhotoCard(
                             photo = photo,
                             imageUrl = viewModel.getPhotoUrl(photo, "w"),
+                            modifier = Modifier.testTag("PhotoCard"),
                             onClick = {
                                 viewModel.selectPhoto(photo)
                             }

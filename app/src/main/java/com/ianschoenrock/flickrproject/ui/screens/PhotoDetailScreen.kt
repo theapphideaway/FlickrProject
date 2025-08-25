@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -54,7 +55,8 @@ fun PhotoDetailScreen(
                 Text(
                     text = photoInfo?.title?._content?.ifEmpty { photo.title.ifEmpty { "Photo Details" } }
                         ?: photo.title.ifEmpty { "Photo Details" },
-                    maxLines = 1
+                    maxLines = 1,
+                    modifier = Modifier.testTag("PhotoDetailTitle"),
                 )
             },
             navigationIcon = {
