@@ -14,7 +14,7 @@ Users can search photos, scroll infinitely through results, and view photo detai
 - 💉 **Hilt DI** for dependency injection.  
 - 🌐 **Retrofit + Moshi** for networking and JSON parsing.  
 - 🖼️ **Coil** for efficient image loading and caching.  
-- 🧪 **Testing** with `MockWebServer` and **Compose UI tests** (E2E flow: search → scroll → open detail).
+- 🧪 **Testing** with `MockWebServer` and **Compose UI tests**.
 
 ---
 
